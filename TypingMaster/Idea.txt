@@ -1,0 +1,8 @@
+1. Yes, my idea for the app is somewhat based on this website https://typingme.com/touch-typing/typing-lesson-1.php. 
+2. It includes a picture and description for that level, there should be multiple levels. 
+3. I also want to display a virtual keyboard too. 
+4. There should be 3 mode types (but the first 2 modes must use only the key in that level): completely random, english word/sentences, AI generated (literature, code, long passages, other languages,...) 
+5. The AI generated mode should not have any level.
+6. The AI mode will use CHATGPT API to generate the text (or any other similar API).
+7. The app should track user progress, including speed (WPM), accuracy, and improvement over time.
+8. The app should have timers and scoring systems to motivate users (but users could choose to turn it off).

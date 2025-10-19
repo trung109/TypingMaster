@@ -1,0 +1,39 @@
+Lesson {
+  - ID
+  - Title
+  - Description
+  - AllowedKeys (string: characters usable in this lesson)
+  - ImagePath (finger position diagram)
+  - Order (sequence)
+  - Difficulty
+  - KeyFingerMap (which finger for each key, for color coding)
+}
+
+
+TypingSession {
+  - SessionID
+  - LessonID (which lesson was practiced)
+  - Mode (Random/Word/AI)
+  - StartTime
+  - EndTime
+  - TextDisplayed (what text user typed)
+  - UserInput (what user actually typed)
+  - TotalCharacters
+  - CorrectCharacters
+  - WPM (calculated)
+  - Accuracy (calculated)
+  - MistakeKeys (which keys were pressed wrong, for analysis)
+}
+
+UserProgress {
+  - UserID
+  - TotalSessions
+  - TotalTimePracticed
+  - AverageWPM
+  - BestWPM
+  - AverageAccuracy
+  - LessonProgress (which lessons completed, stars earned, etc.)
+  - WeakKeys (keys user struggles with most)
+  - LastPracticeDate
+  - ImprovementGraph (WPM over time)
+}
