@@ -17,24 +17,49 @@ namespace TypingMaster
     /// </summary>
     public partial class MainWindow : Window
     {
-        private TypingPracticeVewModel viewModel;
+        private TypingPracticeViewModel viewModel;
         public MainWindow()
         {
             InitializeComponent();
 
-            viewModel = new TypingPracticeVewModel();
+            viewModel = new TypingPracticeViewModel();
             this.DataContext = viewModel;
 
 
             this.PreviewKeyDown += MainWindow_PreviewKeyDown;
+            this.PreviewKeyUp += MainWindow_PreviewKeyUp;
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                viewModel.OnShiftPressed();
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.CapsLock)
+            {
+                viewModel.OnCapsLockToggled();
+                e.Handled = true;
+                return;
+            }
+
             char? keyChar = GetCharFromKey(e.Key);
             if (keyChar.HasValue)
             {
                 viewModel.OnKeyPressed(keyChar.Value);
+                e.Handled = true;
+            }
+        }
+
+        private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                viewModel.OnShiftReleased();
                 e.Handled = true;
             }
         }

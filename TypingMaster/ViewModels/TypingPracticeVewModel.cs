@@ -13,7 +13,7 @@ using TypingMaster.Models;
 
 namespace TypingMaster.ViewModels
 {
-    public partial class TypingPracticeVewModel : ObservableObject
+    public partial class TypingPracticeViewModel : ObservableObject
     {
         [ObservableProperty]
         private string targetText = "Hello, Worlds!";
@@ -26,6 +26,15 @@ namespace TypingMaster.ViewModels
 
         [ObservableProperty]
         private int cursorPosition = 0;
+
+        [ObservableProperty]
+        private char currentChar = '\0';
+
+        [ObservableProperty]
+        private char targetChar = '\0';
+
+        [ObservableProperty]
+        private int keyPressTrigger = 0;
 
         [ObservableProperty]
         private int wpm = 0;
@@ -42,18 +51,35 @@ namespace TypingMaster.ViewModels
         [ObservableProperty]
         private bool isSessionActive = false;
 
+        [ObservableProperty]
+        private bool isShiftPressed = false;
+
+        [ObservableProperty]
+        private bool isCapsLockActive = false;
+
+        [ObservableProperty]
+        private bool isShiftRequired = false;
+
+        [ObservableProperty]
+        private bool? isLastKeyCorrect = null;
+
         private DateTime sessionStartTime;
         private TypingSession currentSession;
         
-        public TypingPracticeVewModel()
+        public TypingPracticeViewModel()
         {   
             currentSession = new TypingSession();
             formattedTextInlines = new ObservableCollection<Inline>();
             UpdateDisplayText();
+            UpdateShiftRequirement();
         }
 
         public void OnKeyPressed(char keyChar)
         {
+
+            CurrentChar = keyChar;
+            KeyPressTrigger = 1 - KeyPressTrigger;
+
             if (!IsSessionActive)
             {
                 StartSession();
@@ -62,16 +88,23 @@ namespace TypingMaster.ViewModels
             if (CursorPosition < TargetText.Length)
             {
                 char expectedChar = TargetText[CursorPosition];
+                TargetChar = expectedChar;
+
+                IsShiftRequired = char.IsUpper(expectedChar) || IsSymbolRequiringShift(expectedChar);
 
                 if (keyChar == expectedChar)
                 {
+                    IsLastKeyCorrect = true;
                     UserInput += keyChar;
                     CursorPosition++;
                     currentSession.CorrectCharacters++;
-                    UpdateDisplayText(true);    
+                    UpdateDisplayText(true);
+
+                    UpdateShiftRequirement();
                 } 
                 else
-                {
+                {   
+                    IsLastKeyCorrect = false;
                     ErrorCount++;
                     if (currentSession.MistakeKeys.ContainsKey(expectedChar))
                     {
@@ -91,6 +124,38 @@ namespace TypingMaster.ViewModels
                 {
                     EndSession();
                 }
+            }
+        }
+
+        public void OnShiftPressed()
+        {
+            IsShiftPressed = true;
+        }
+
+        public void OnShiftReleased()
+        {
+            IsShiftPressed = false;
+        }
+
+        public void OnCapsLockToggled()
+        {
+            IsCapsLockActive = !IsCapsLockActive;
+        }
+        private bool IsSymbolRequiringShift(char c)
+        {
+            return "!@#$%^&*()_+{}|:\"<>?~".Contains(c);
+        }
+
+        private void UpdateShiftRequirement()
+        {
+            if (CursorPosition < TargetText.Length)
+            {
+                char nextChar = TargetText[CursorPosition];
+                IsShiftRequired = char.IsUpper(nextChar) || IsSymbolRequiringShift(nextChar);
+            }
+            else
+            {
+                IsShiftRequired = false;
             }
         }
 
@@ -138,6 +203,11 @@ namespace TypingMaster.ViewModels
         {
             FormattedTextInlines.Clear();
 
+            if (CursorPosition < TargetText.Length)
+            {
+                TargetChar = TargetText[CursorPosition];
+            }
+
             for (int i = 0; i < TargetText.Length; i++)
             {
                 var run = new Run(TargetText[i].ToString());
@@ -152,6 +222,10 @@ namespace TypingMaster.ViewModels
                     {
                         run.Background = Brushes.Red;
                     }
+                    else
+                    {
+                        run.Background = Brushes.Yellow;
+                    }
                     run.Foreground = Brushes.Black;
                     run.FontWeight = FontWeights.Bold;
                 }
@@ -162,9 +236,6 @@ namespace TypingMaster.ViewModels
 
                 FormattedTextInlines.Add(run);
             }
-
-
         }
-        
     }
 }
